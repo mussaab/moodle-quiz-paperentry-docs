@@ -1,0 +1,17 @@
+/* Paper Entry docs — Starlight custom theme overrides */
+
+:root {
+  --sl-color-accent-low:  #e8f4fd;
+  --sl-color-accent:      #0071c2;   /* Moodle brand orange-ish blue */
+  --sl-color-accent-high: #004a80;
+}
+
+/* Slightly wider content column for wide tables */
+.sl-markdown-content {
+  max-width: 52rem;
+}
+
+/* Role badge pills used in capability tables */
+.badge-manager  { background: #6f42c1; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: .8em; }
+.badge-teacher  { background: #0d6efd; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: .8em; }
+.badge-grader   { background: #198754; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: .8em; }

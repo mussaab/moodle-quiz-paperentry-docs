@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 32" fill="none">
+  <!-- Sheet of paper -->
+  <rect x="2" y="2" width="22" height="28" rx="2" fill="#e8f4fd" stroke="#0071c2" stroke-width="1.5"/>
+  <!-- Lines on paper -->
+  <line x1="7"  y1="9"  x2="19" y2="9"  stroke="#0071c2" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="7"  y1="13" x2="19" y2="13" stroke="#0071c2" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="7"  y1="17" x2="14" y2="17" stroke="#0071c2" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Pencil tick -->
+  <polyline points="15,22 18,19 21,24" stroke="#198754" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Text -->
+  <text x="32" y="22" font-family="system-ui,sans-serif" font-size="17" font-weight="700" fill="#004a80">Paper Entry</text>
+</svg>

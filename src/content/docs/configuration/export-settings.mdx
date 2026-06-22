@@ -1,0 +1,86 @@
+---
+title: Export Settings
+description: Configuring which student columns appear in the grading sheet.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Export settings control what *student identification* columns are included in the
+grading sheet alongside the answer columns.
+
+Settings are **per-quiz** — different quizzes in the same course can have different
+export configurations.
+
+---
+
+## Opening the settings
+
+Open the quiz → Paper Entry tab (requires `quiz/paperentry:manage`). The
+**Export Settings** card is at the top of the page.
+
+---
+
+## Available columns
+
+The tag-picker UI shows all profile fields that are available on the site:
+
+| Field | Description |
+|---|---|
+| `email` | The student's Moodle account email address |
+| `idnumber` | Institutional / student ID number |
+| `firstname` | First name |
+| `lastname` | Last name |
+| `phone1` | Primary phone |
+| `phone2` | Secondary phone |
+| `department` | Department |
+| `institution` | Institution |
+| `city` | City / town |
+| `country` | Country code |
+| `profile_field_*` | Any custom profile fields defined on the site |
+
+Only fields that have values for at least some enrolled students are useful to
+include.
+
+---
+
+## How the student is identified at import
+
+During import, the plugin uses **the first recognised profile column** it finds in
+the uploaded CSV to look up the student's Moodle account.
+
+Priority order:
+1. `idnumber` — preferred because it is stable and unique
+2. `email` — reliable but can change
+3. `username` — if present
+4. `firstname` + `lastname` combined — last resort; ambiguous for students with the
+   same name
+
+<Aside type="tip">
+  Always include **`idnumber`** if your institution assigns stable student ID numbers.
+  It is the most reliable identifier and reduces the chance of import errors caused
+  by name changes or shared email domains.
+</Aside>
+
+---
+
+## Saving settings
+
+Click **Save settings** after making changes. The settings are stored in
+`quiz_paperentry_settings` and take effect immediately on the next CSV export.
+
+---
+
+## Re-exporting after settings change
+
+If you change the export settings after graders have already downloaded the blank
+sheet, you will need to:
+
+1. Re-export the grading sheet.
+2. Notify graders to use the new template (old uploads with different column
+   structures may fail validation).
+
+<Aside type="caution">
+  If a grader uploads a CSV that is missing the profile column the plugin expects,
+  the import will fail with an error. Always share the updated grading sheet when you
+  change export settings.
+</Aside>

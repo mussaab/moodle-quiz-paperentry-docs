@@ -1,0 +1,147 @@
+---
+title: Contributing
+description: How to contribute to Paper Entry development.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Contributions are welcome — bug reports, feature suggestions, documentation
+improvements, and code changes are all appreciated.
+
+---
+
+## Getting started
+
+<Steps>
+
+1. **Fork** the repository on GitHub.
+
+2. **Clone** your fork:
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/moodle-quiz-paperentry.git
+   cd moodle-quiz-paperentry
+   ```
+
+3. **Link** the plugin into a Moodle development instance:
+   ```bash
+   ln -s $(pwd) /path/to/moodle/mod/quiz/report/paperentry
+   ```
+
+4. **Create a branch** for your change:
+   ```bash
+   git checkout -b feature/my-improvement
+   ```
+
+5. Make your changes, add tests, and verify everything passes.
+
+6. **Push** and open a pull request against `main`.
+
+</Steps>
+
+---
+
+## Development environment
+
+You will need:
+
+- Moodle 5.0 or 5.1 development instance (Docker or MAMP both work).
+- PHP 8.1+ with Xdebug for test coverage.
+- Node.js 18+ for AMD build (`grunt amd`).
+- Composer for PHPUnit.
+
+### AMD build
+
+After editing `amd/src/*.js`, rebuild the minified AMD output:
+
+```bash
+# From Moodle root
+grunt amd --root=mod/quiz/report/paperentry
+```
+
+This writes the minified files to `amd/build/`.
+
+<Aside type="note">
+  Never commit unminified AMD source changes without also committing the
+  corresponding `amd/build/` file. Moodle serves the build file in production.
+</Aside>
+
+---
+
+## Code standards
+
+### PHP
+
+Follow the [Moodle coding style](https://moodledev.io/general/development/policies/codingstyle).
+Run the checker before every commit:
+
+```bash
+php local/codechecker/cli/check.php mod/quiz/report/paperentry
+```
+
+Key rules:
+- 4-space indentation (no tabs).
+- PHP file header with `@package`, `@copyright`, `@license` docblock.
+- All output via `$OUTPUT` or Mustache templates — no raw `echo`.
+- No inline `<script>` — use `$PAGE->requires->js_call_amd()`.
+
+### JavaScript (AMD)
+
+- ES2017 syntax is fine (Moodle 5.x supports it).
+- Use `core/ajax`, `core/str`, `core/notification` from the Moodle AMD library
+  where available — don't reinvent the wheel.
+- Keep modules small and single-purpose.
+
+### Mustache templates
+
+- No PHP logic in templates — compute all data in PHP and pass a flat context.
+- Use `{{# str }} string_key, plugin_component {{/ str }}` for localised strings.
+- Run `vendor/bin/phpunit --filter mustache` to validate template syntax.
+
+---
+
+## Tests
+
+Add PHPUnit tests for any new functionality. Tests live in `tests/`:
+
+```bash
+# Run the full suite
+vendor/bin/phpunit mod/quiz/report/paperentry/tests/
+
+# Run with coverage
+vendor/bin/phpunit --coverage-html /tmp/cov \
+    mod/quiz/report/paperentry/tests/
+```
+
+Target: every new public method should have at least one test.
+
+---
+
+## Pull request checklist
+
+- [ ] Code passes `phpcs --standard=moodle`
+- [ ] AMD build files updated (`grunt amd`)
+- [ ] PHPUnit tests pass
+- [ ] New functionality has test coverage
+- [ ] Language strings added to `lang/en/quiz_paperentry.php`
+- [ ] `version.php` bumped with a new `$plugin->version` timestamp
+- [ ] CHANGELOG entry added under a new `[x.y.z]` heading
+- [ ] PR description explains *why* the change is needed, not just *what* it does
+
+---
+
+## Reporting bugs
+
+Open a [GitHub Issue](https://github.com/your-org/moodle-quiz-paperentry/issues)
+with:
+
+1. Moodle version and Paper Entry version.
+2. Steps to reproduce.
+3. Expected behaviour vs. actual behaviour.
+4. Any relevant error messages from the Moodle logs.
+
+---
+
+## License
+
+By contributing you agree that your contributions will be licensed under the
+[GNU General Public License v3 or later](https://www.gnu.org/copyleft/gpl.html).

@@ -1,0 +1,97 @@
+---
+title: Backup & Restore
+description: What is and isn't backed up when you back up a Moodle quiz.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="Known architectural limitation">
+  Moodle's quiz backup engine only calls **`quizaccess`** subplugins during backup.
+  Quiz **report** subplugins (including Paper Entry) are not invoked. This is a gap
+  in Moodle core that cannot be worked around without patching core files.
+</Aside>
+
+---
+
+## What IS backed up
+
+Moodle's standard quiz backup includes everything in core quiz tables:
+
+| Data | Backed up? |
+|---|---|
+| Quiz structure (questions, slots, grades) | ✅ Yes |
+| Student quiz attempts and grades | ✅ Yes |
+| Question attempt details (per-question responses) | ✅ Yes |
+
+Quiz attempts created by Paper Entry are **standard Moodle quiz attempts** stored
+in `quiz_attempts`, `question_attempts`, etc. They are fully included in every
+quiz backup and restore correctly without any special handling.
+
+---
+
+## What is NOT backed up
+
+| Data | Backed up? | Why |
+|---|---|---|
+| Grader assignments (`quiz_paperentry_graders`) | ❌ No | Backup API not called |
+| Export settings (`quiz_paperentry_settings`) | ❌ No | Backup API not called |
+| Value substitutions (`quiz_paperentry_mappings`) | ❌ No | Backup API not called |
+| Grader CSV submissions (File API) | ❌ No | Backup API not called |
+
+---
+
+## Impact of a restore
+
+After restoring a quiz backup:
+
+1. **Student grades are intact** — all quiz attempts restore correctly.
+2. **Graders must be re-assigned** — the grader list is empty after restore.
+3. **Export settings must be reconfigured** — extra profile columns are lost.
+4. **Value substitutions must be re-entered** — mapping rules are lost.
+
+For most use cases, re-configuring takes only a few minutes.
+
+---
+
+## Workaround: manual data export
+
+If you need to preserve Paper Entry configuration across a site migration, you can
+manually export the relevant tables before migration and import them after:
+
+```sql
+-- Export (run on source site)
+SELECT * FROM mdl_quiz_paperentry_settings WHERE quizid = ?;
+SELECT * FROM mdl_quiz_paperentry_graders  WHERE quizid = ?;
+SELECT * FROM mdl_quiz_paperentry_mappings WHERE quizid = ?;
+```
+
+After restoring, insert the rows with updated `quizid` values (the quiz ID changes
+on restore).
+
+---
+
+## Roadmap
+
+A Moodle tracker issue should be raised to add quiz report subplugin backup support
+to Moodle core. Once core supports it, Paper Entry will implement the backup/restore
+classes:
+
+- `backup_quiz_paperentry_stepslib.php` — `backup_quiz_paperentry_activity_structure_step`
+- `restore_quiz_paperentry_stepslib.php` — `restore_quiz_paperentry_activity_structure_step`
+
+If you need this feature urgently, consider contributing it to both Moodle core
+(the quiz backup framework) and this plugin.
+
+---
+
+## Course reset
+
+When a teacher resets a course (removing student data), Paper Entry responds to the
+reset form via the standard Moodle reset mechanism. The reset removes:
+
+- `quiz_paperentry_attempts` records for the quiz (the tracking link between
+  Paper Entry and the Moodle attempt is removed).
+- The Moodle quiz attempts themselves are removed by Moodle core's quiz reset handler.
+
+Grader assignments and export settings are **not** removed by a course reset —
+they are configuration, not student data.

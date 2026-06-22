@@ -1,0 +1,69 @@
+---
+title: Edit Answer
+description: Correcting a single student's answer without re-uploading a full CSV.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The **Edit Answer** panel lets a manager correct one answer for one student directly
+in the Moodle interface — no need to modify and re-upload a CSV file.
+
+---
+
+## When to use it
+
+| Situation | Recommendation |
+|---|---|
+| One student's answer was mis-transcribed | Edit Answer |
+| A remark changes a single question for one student | Edit Answer |
+| Multiple students need corrections | Re-upload the grader's CSV |
+| You want to change many questions at once | Re-upload via Direct Import |
+
+---
+
+## How it works
+
+<Aside type="note">
+  Edit Answer modifies an **existing** Moodle quiz attempt that was already committed
+  to the gradebook. It is equivalent to opening the attempt in the quiz engine and
+  changing the response — grades are recalculated immediately.
+</Aside>
+
+### Step-by-step
+
+1. Open the quiz → Paper Entry tab (manager view).
+2. Scroll to the **Edit Answer** card.
+3. Select a student from the **Student** drop-down. The panel loads their current
+   answers.
+4. The current answers are shown as a list of question name → current value pairs.
+5. Click on the answer you want to change.
+6. Type the new value (must match a valid answer option for the question, or a
+   configured value substitution).
+7. Click **Save**.
+
+The attempt is updated and the grade is recalculated in real time.
+
+---
+
+## Constraints
+
+- The student must have an existing attempt created by Paper Entry (or any Moodle
+  quiz attempt).
+- The new answer must be a valid option for the question. Invalid values are
+  rejected with an error message showing the valid options.
+- Edit Answer works on `multichoice` and `truefalse` questions only — the same
+  constraint as the CSV import.
+
+---
+
+## Audit trail
+
+Every edit is recorded in Moodle's standard event log:
+
+- Event: `\quiz_paperentry\event\answer_edited`
+- Actor: the manager who made the change
+- Context: module context of the quiz
+- Extra data: student userid, question slot, old value, new value
+
+This means edits are visible in the **Site administration → Reports → Logs** view,
+providing a full audit trail for re-mark disputes.

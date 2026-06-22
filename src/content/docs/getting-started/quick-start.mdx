@@ -1,0 +1,69 @@
+---
+title: Quick Start
+description: Set up and run your first paper exam import in under 10 minutes.
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Paper Entry supports two workflows. Pick the one that fits your setup.
+
+<Tabs>
+<TabItem label="Workflow A — Direct import">
+
+The manager grades the papers and imports directly. No other teachers involved.
+
+**Before you begin:** you need a quiz with at least one `multichoice` or `truefalse`
+question, with "Shuffle answers" off. You need `quiz/paperentry:manage`.
+
+<Steps>
+
+1. Open the quiz → **Paper Entry** tab.
+
+2. *(Optional)* In **Export Settings**, tick any extra profile columns (ID number, class, etc.) and click **Save settings**.
+
+3. Click **Download grading sheet**. Students sit their paper exam as normal. Afterwards, fill in the grading sheet with each student's answers from their paper sheet.
+
+4. Scroll to **Direct Import — Admin Override** (collapsed by default), expand it, choose your filled CSV, and click **Import**.
+
+5. Grades appear in the quiz gradebook immediately.
+
+</Steps>
+
+<Aside type="tip">
+  Re-importing replaces previous Paper Entry attempts — it won't create duplicates.
+</Aside>
+
+</TabItem>
+<TabItem label="Workflow B — Multi-grader">
+
+Two or more graders mark independently. A comparison table catches every disagreement before grades are committed.
+
+**Before you begin:** same as Workflow A, plus at least two teachers who will grade independently.
+
+<Steps>
+
+1. Open the quiz → **Paper Entry** tab.
+
+2. In **Export Settings**, choose extra profile columns and click **Save settings**.
+
+3. In the **Graders** card, add each independent grader by name.
+
+4. Students sit their paper exam as normal. Each grader then downloads the grading sheet themselves (via the **Download grading sheet** button on their Paper Entry tab view) and fills in student answers from the collected paper sheets independently.
+
+5. Each grader opens the quiz → Paper Entry tab, uploads their filled CSV via **Submit Your Answers**, and clicks **Submit**.
+
+6. Graders see their own conflict status (colour-coded, without seeing other graders' answers) and re-upload until all cells turn green. As manager you monitor the full comparison table with all graders' answers side-by-side.
+
+7. When every cell is **green** (all graders agree), click **Submit to Gradebook**.
+
+8. Graded quiz attempts are created for all students — grades appear immediately.
+
+</Steps>
+
+<Aside type="tip">
+  Use [Value Substitutions](/configuration/value-substitutions/) to let graders enter
+  `T`/`F` or `1`/`2`/`3` instead of full answer text.
+</Aside>
+
+</TabItem>
+</Tabs>

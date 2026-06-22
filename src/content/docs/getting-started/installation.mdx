@@ -1,0 +1,111 @@
+---
+title: Installation
+description: How to install Paper Entry on your Moodle 5.0+ site.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Requirements
+
+| Requirement | Version |
+|---|---|
+| Moodle | **5.0 or later** |
+
+Paper Entry requires Moodle 5.0+. PHP version and database requirements are
+determined by your Moodle version — no additional server requirements beyond
+what Moodle itself needs.
+
+---
+
+## Installing from a ZIP
+
+<Steps>
+
+1. Download the latest release ZIP from the
+   [GitHub Releases](https://github.com/your-org/moodle-quiz-paperentry/releases) page
+   or from the [Moodle Plugin Directory](https://moodle.org/plugins/).
+
+2. Log in to your Moodle site as a **site administrator**.
+
+3. Go to **Site administration → Plugins → Install plugins**.
+
+4. Drag the ZIP into the upload area (or use the file picker) and click
+   **Install plugin from the ZIP file**.
+
+5. Moodle will validate the package and show a confirmation screen. Click
+   **Continue**.
+
+6. Review and confirm the database upgrade on the **Notifications** page.
+
+</Steps>
+
+---
+
+## Installing manually (Git / SSH)
+
+<Steps>
+
+1. SSH into your server and `cd` to your Moodle root.
+
+2. Clone (or copy) the plugin into the correct location:
+
+   ```bash
+   git clone https://github.com/your-org/moodle-quiz-paperentry.git \
+       mod/quiz/report/paperentry
+   ```
+
+3. Fix ownership so your web server can read the files:
+
+   ```bash
+   chown -R www-data:www-data mod/quiz/report/paperentry
+   ```
+
+4. Log in as a site administrator and navigate to
+   **Site administration → Notifications** to run the database upgrade.
+
+</Steps>
+
+---
+
+## What the installer creates
+
+The upgrade script creates four database tables:
+
+| Table | Purpose |
+|---|---|
+| `quiz_paperentry_settings` | Per-quiz export configuration (extra profile columns) |
+| `quiz_paperentry_graders` | Grader assignments per quiz |
+| `quiz_paperentry_attempts` | Which Moodle quiz attempts were created by this plugin |
+| `quiz_paperentry_mappings` | Per-quiz value-substitution rules |
+
+All student-facing data (grades, attempt details) lives in standard Moodle tables
+(`quiz_attempts`, `question_attempts`, etc.) and is managed by Moodle core.
+
+---
+
+## Upgrading
+
+Re-run the installer steps with the new ZIP (or `git pull` on your clone) and visit
+**Site administration → Notifications**. The upgrade script is idempotent — it will
+only apply steps that have not been applied yet.
+
+<Aside type="note">
+  After upgrading from a version that stored grader CSV submissions in the database
+  (`csvdata` column), the upgrade script automatically migrates all existing
+  submissions to the Moodle File API and drops the old column. This is irreversible —
+  take a full database and `moodledata` backup before upgrading.
+</Aside>
+
+---
+
+## Uninstalling
+
+Go to **Site administration → Plugins → Plugins overview**, find *Paper Entry* under
+*Quiz reports*, and click **Uninstall**. Moodle will drop all plugin tables and
+remove all plugin files from `moodledata`.
+
+<Aside type="caution">
+  Uninstalling removes grader assignments and value mappings. Student quiz attempts
+  that were already created by the plugin are **not** deleted — they are standard
+  Moodle quiz attempts and will remain in the gradebook.
+</Aside>

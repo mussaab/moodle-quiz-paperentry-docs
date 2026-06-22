@@ -1,0 +1,107 @@
+---
+title: Capabilities & Roles
+description: How Moodle capabilities control access to Paper Entry.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Paper Entry uses three Moodle capabilities to control access. All capabilities
+live under the `quiz/paperentry` namespace.
+
+---
+
+## Capability reference
+
+### `quiz/paperentry:view`
+
+| Property | Value |
+|---|---|
+| **Archetypes** | `teacher`, `editingteacher`, `manager` |
+| **Risk bitmask** | `RISK_PERSONAL` |
+| **Description** | View the Paper Entry report tab and download the grading sheet. |
+
+This is the minimum capability needed to see the tab at all. It is granted
+to all standard teaching roles by default.
+
+---
+
+### `quiz/paperentry:submit`
+
+| Property | Value |
+|---|---|
+| **Archetypes** | *(none)* |
+| **Risk bitmask** | `RISK_SPAM` |
+| **Description** | Upload a filled grader CSV for a specific quiz. |
+
+This capability is **not** granted to any role archetype. It is assigned
+per-quiz by the manager, at the **module context**, to specific users via
+the internal `paperentry_grader` role.
+
+When a manager adds a user as a grader, the following happens automatically:
+1. The `paperentry_grader` role is created (if it doesn't exist).
+2. The user is assigned that role at the quiz's module context.
+3. The role grants `quiz/paperentry:submit` only at `CONTEXT_MODULE` level.
+
+When a grader is removed, the role assignment is revoked.
+
+<Aside type="note">
+  Because the capability is scoped to a single module context, a grader for
+  Quiz A cannot submit answers for Quiz B, even within the same course.
+</Aside>
+
+---
+
+### `quiz/paperentry:manage`
+
+| Property | Value |
+|---|---|
+| **Archetypes** | `manager` |
+| **Risk bitmask** | `RISK_PERSONAL`, `RISK_DATALOSS` |
+| **Description** | Full control: configure settings, assign graders, view comparison table, trigger gradebook import. |
+
+This capability is restricted to the **Manager** role archetype. Regular editing
+teachers do **not** have this capability by default — they can view and download
+but cannot trigger the final import.
+
+<Aside type="caution">
+  Site administrators bypass all capability checks in Moodle and always have
+  full access. If you are testing role behaviour, use a non-admin account.
+</Aside>
+
+---
+
+## Role architecture
+
+```
+Site Administrator
+ └── bypasses all checks (Moodle core behaviour)
+
+Manager (course role)
+ └── quiz/paperentry:view    ✓
+ └── quiz/paperentry:manage  ✓
+ └── quiz/paperentry:submit  ✗ (not needed — manage covers everything)
+
+Editing Teacher (course role)
+ └── quiz/paperentry:view    ✓
+ └── quiz/paperentry:manage  ✗
+ └── quiz/paperentry:submit  ✗
+
+paperentry_grader (module-level internal role)
+ └── quiz/paperentry:submit  ✓ (only at the specific quiz's module context)
+```
+
+---
+
+## Customising capabilities
+
+You can grant additional capabilities to roles through **Site administration →
+Users → Permissions → Define roles**, or at the course/activity level through
+the standard Moodle override interface.
+
+Common customisations:
+
+| Goal | Action |
+|---|---|
+| Allow editing teachers to manage imports | Grant `quiz/paperentry:manage` to `editingteacher` archetype |
+| Create a dedicated paper-exam coordinator role | Create a custom role with `view` + `manage`; assign to coordinators |
+| Allow a student to be a grader | Assign the `paperentry_grader` role to the student at module context, or use the *Add grader* UI |

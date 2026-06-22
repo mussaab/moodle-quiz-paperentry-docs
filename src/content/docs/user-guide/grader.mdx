@@ -1,0 +1,126 @@
+---
+title: Grader Workflow
+description: How a grader submits their paper-exam answers in Paper Entry.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A **grader** is a teacher who has been assigned to a quiz by a manager. Their job is
+to mark the paper answer sheets and upload a filled CSV to Moodle.
+
+---
+
+## Prerequisites
+
+- A manager must have added you as a grader for the quiz (see
+  [Manager Workflow → Managing graders](/user-guide/manager/#managing-graders)).
+- You need access to the quiz (typically the Teacher or Non-editing teacher role in
+  the course).
+
+---
+
+## Step 1 — Open the Paper Entry tab
+
+Navigate to the quiz and click the **Paper Entry** tab. If you are assigned as a
+grader you will see the **Submit Your Answers** form. You will *not* see the manager
+sections (grader list, comparison table, gradebook import button).
+
+---
+
+## Step 2 — Download the grading sheet
+
+Download the grading sheet yourself using the **Download grading sheet** button on the Paper
+Entry tab (visible to anyone with the `quiz/paperentry:view` capability, which the
+Teacher role has by default).
+
+The grading sheet has one row per student and one column per question, plus any extra
+profile columns the manager configured.
+
+---
+
+## Step 3 — Fill in the CSV from the paper sheets
+
+Once students have sat their paper exam and the answer sheets are collected, open the
+grading sheet in a spreadsheet application (Excel, LibreOffice Calc, Numbers) and type
+each student's answers as recorded on their paper.
+
+### Answer values
+
+Enter the answer exactly as it appears in the question — typically a letter (`a`,
+`b`, `c`, `d`) or a short text value (`True`, `False`).
+
+<Aside type="tip">
+  If the manager has set up **value substitutions**, you can use the shorthand values
+  they defined (e.g. `1`, `2`, `3` or `T`, `F`). The plugin will translate these
+  automatically at import time.
+</Aside>
+
+### Leaving an answer blank
+
+Leave the cell empty if a student did not answer a question. The import will record
+it as "no response" rather than a wrong answer.
+
+---
+
+## Step 4 — Upload your CSV
+
+1. In the **Submit Your Answers** card, click **Choose file** (or drag your CSV onto
+   the upload area).
+2. Select your filled CSV file.
+3. Click **Submit**.
+
+The plugin validates your file immediately. If any answer does not match a valid
+option for a question, the import is **aborted** and a detailed error message is
+shown:
+
+```
+Row 4: "T" does not match any answer option for question "Capital cities".
+Valid options are: "Paris", "London", "Berlin", "Madrid".
+```
+
+Fix the answer in your CSV and re-upload.
+
+<Aside type="note">
+  Your submission replaces any previous submission. You can re-upload as many times
+  as needed until the manager triggers the final import.
+</Aside>
+
+---
+
+## Step 5 — Check your conflict status and re-upload if needed
+
+After a successful upload, you will see your own **conflict status table** — a
+colour-coded view that shows which answers disagree with other graders,
+**without revealing what the other graders entered** (each grader works independently).
+
+- **Green cell** — all graders agree on this answer.
+- **Red cell** — your answer differs from another grader's answer for this question.
+
+If you see red cells, review the relevant paper sheets, correct the answers in your
+CSV, and re-upload. You can re-upload as many times as needed.
+
+<Aside type="note">
+  You do not need to coordinate directly with other graders — just fix the answers
+  you believe are wrong based on the paper sheets and re-upload. The manager monitors
+  the overall status and will follow up if needed.
+</Aside>
+
+---
+
+## What happens after all cells are green?
+
+Once every grader's submission agrees on every answer, the manager sees a fully green
+comparison table (with student names visible to them) and clicks **Submit to Gradebook**.
+Student grades appear in the quiz gradebook automatically — you don't need to do
+anything else.
+
+---
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| "Submit Your Answers" form not visible | Ask the manager to add you as a grader |
+| Upload rejected — bad answer | Check the valid options shown in the error message and correct your CSV |
+| Upload rejected — unknown student | The student's identifier in the CSV doesn't match a Moodle account — check the profile column value |
+| You can see the manager dashboard | You have the `manage` capability — you are acting as a manager, not a grader |

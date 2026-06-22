@@ -1,0 +1,104 @@
+---
+title: Privacy & GDPR
+description: How Paper Entry handles personal data in compliance with GDPR.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Paper Entry implements the Moodle Privacy API and is fully compliant with GDPR
+requirements. This page describes what personal data is stored, why, and what
+happens when a data subject requests export or deletion.
+
+---
+
+## Data inventory
+
+### Student data
+
+| Data item | Location | Reason stored |
+|---|---|---|
+| User ID | `quiz_paperentry_attempts.userid` | Links import record to the student |
+| Quiz attempt | `quiz_attempts.*` (Moodle core table) | The actual graded attempt |
+
+The quiz attempt itself (grades, responses) is stored in **Moodle core tables**
+and is managed by Moodle core's Privacy API — Paper Entry only stores a reference
+to it.
+
+### Grader data
+
+| Data item | Location | Reason stored |
+|---|---|---|
+| User ID | `quiz_paperentry_graders.userid` | Records who is assigned as a grader |
+| Uploaded CSV file | Moodle File API (`quiz_paperentry / submission`) | The grader's answer sheet |
+
+---
+
+## Privacy metadata declaration
+
+The `get_metadata()` method declares:
+
+```
+quiz_paperentry_graders table → userid, quizid, timecreated
+quiz_paperentry_attempts table → userid, quizid, attemptid, timecreated
+Pluginfile area quiz_paperentry/submission → grader-uploaded CSV files
+```
+
+---
+
+## Data export
+
+When a Moodle administrator exports data for a user:
+
+- **As a student:** any `quiz_paperentry_attempts` records for the user are exported,
+  along with a note linking to the full quiz attempt data managed by Moodle core.
+- **As a grader:** any `quiz_paperentry_graders` assignments are exported, and any
+  uploaded CSV file is included via `writer->export_area_files()`.
+
+---
+
+## Data deletion
+
+### Delete all users in a context
+
+Called when a course or activity is deleted. Removes:
+- All `quiz_paperentry_graders` rows for the context.
+- All `quiz_paperentry_attempts` rows for the context.
+- All submission files in the context (`$fs->delete_area_files($contextid, 'quiz_paperentry', 'submission')`).
+
+### Delete data for a specific user
+
+Called when a user exercises their "right to erasure". Removes:
+- `quiz_paperentry_graders` rows where `userid = $user->id`.
+- `quiz_paperentry_attempts` rows where `userid = $user->id`.
+- The user's submission file (`itemid = $user->id`).
+
+<Aside type="caution">
+  Deleting a student's paper-entry attempt record does **not** automatically delete
+  the quiz attempt in Moodle core — that is managed separately by Moodle's quiz
+  Privacy provider. The two deletions happen in the same privacy request but are
+  handled by independent providers.
+</Aside>
+
+### Bulk deletion (userlist)
+
+The plugin implements `core_userlist_provider` for efficient bulk deletions — for
+example when a course is reset or a large cohort of users is anonymised.
+
+---
+
+## File security
+
+Grader submission files are stored via the Moodle File API with the module context
+as the parent context. Access to these files is controlled by Moodle's file-serving
+layer (`pluginfile.php`), which enforces capability checks before serving the file.
+
+A grader can only download their own submission file. A manager can download all
+submission files for a quiz they manage.
+
+<Aside type="note">
+  CSV submission files contain student identifiers (email, ID number) entered by
+  graders. These are personal data under GDPR and are deleted when a student's
+  erasure request is processed — however, the deletion targets the *grader's* file,
+  not the student record directly. Ensure your data-retention policy accounts for
+  this indirect reference.
+</Aside>

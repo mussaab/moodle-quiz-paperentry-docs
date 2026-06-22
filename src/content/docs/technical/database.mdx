@@ -1,0 +1,110 @@
+---
+title: Database Schema
+description: Table definitions, relationships, and indexes for Paper Entry.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Paper Entry creates four tables in the Moodle database. All tables are defined in
+`db/install.xml` using XMLDB and follow Moodle naming conventions
+(`quiz_paperentry_*`).
+
+---
+
+## `quiz_paperentry_settings`
+
+Stores per-quiz export configuration.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `BIGINT` | Primary key (auto-increment) |
+| `quizid` | `BIGINT` | FK → `quiz.id` |
+| `extrafields` | `TEXT` | JSON-encoded array of profile field shortnames |
+| `timecreated` | `BIGINT` | Unix timestamp |
+| `timemodified` | `BIGINT` | Unix timestamp |
+
+**Indexes:** `quizid`
+
+---
+
+## `quiz_paperentry_graders`
+
+Records which users are assigned as graders for a given quiz.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `BIGINT` | Primary key |
+| `quizid` | `BIGINT` | FK → `quiz.id` |
+| `userid` | `BIGINT` | FK → `user.id` |
+| `timecreated` | `BIGINT` | When the grader was assigned |
+
+**Indexes:** `quizid`, `userid`
+
+<Aside type="note">
+  The `paperentry_grader` role assignment (which grants `quiz/paperentry:submit`)
+  is managed separately in `mdl_role_assignments` — this table only records the
+  *intent* of the grader assignment for display and lookup purposes.
+</Aside>
+
+---
+
+## `quiz_paperentry_attempts`
+
+Links Paper Entry imports to the Moodle quiz attempts they created.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `BIGINT` | Primary key |
+| `quizid` | `BIGINT` | FK → `quiz.id` |
+| `userid` | `BIGINT` | FK → `user.id` (the student) |
+| `attemptid` | `BIGINT` | FK → `quiz_attempts.id` |
+| `timecreated` | `BIGINT` | Import timestamp |
+
+**Indexes:** `quizid`, `userid`
+
+This table allows the plugin to:
+- Identify which attempts it "owns" (vs. attempts made directly in Moodle).
+- Replace an existing attempt on re-import rather than creating a duplicate.
+
+---
+
+## `quiz_paperentry_mappings`
+
+Stores value-substitution rules for a quiz.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `BIGINT` | Primary key |
+| `quizid` | `BIGINT` | FK → `quiz.id` |
+| `fromvalue` | `VARCHAR(255)` | The shorthand value the grader types |
+| `tovalue` | `VARCHAR(255)` | The full Moodle answer text |
+| `timecreated` | `BIGINT` | Unix timestamp |
+
+**Indexes:** `quizid`
+
+---
+
+## Entity-relationship diagram
+
+```
+quiz (Moodle core)
+ ├─< quiz_paperentry_settings   (1 row per quiz)
+ ├─< quiz_paperentry_graders    (1 row per grader per quiz)
+ ├─< quiz_paperentry_mappings   (N rows per quiz)
+ └─< quiz_paperentry_attempts   (1 row per student import per quiz)
+       └──> quiz_attempts (Moodle core)
+
+user (Moodle core)
+ ├─< quiz_paperentry_graders    (grader assignments)
+ └─< quiz_paperentry_attempts   (student import records)
+```
+
+---
+
+## Grader CSV files
+
+Grader answer-sheet uploads are **not** stored in any of these tables. They are
+stored in the **Moodle File API** under the `quiz_paperentry / submission` file
+area. See [Architecture → File API storage](/technical/architecture/#file-api-storage)
+for details.
+

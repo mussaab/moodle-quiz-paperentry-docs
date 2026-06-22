@@ -1,0 +1,134 @@
+---
+title: Manager Workflow
+description: Everything a manager (course coordinator) can do in Paper Entry.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The manager view is available to anyone with the `quiz/paperentry:manage` capability
+(typically the **Manager** role or a site administrator). It provides full control
+over both import workflows.
+
+---
+
+## The two workflows at a glance
+
+| | Workflow A — Direct import | Workflow B — Multi-grader |
+|---|---|---|
+| **Who grades** | Manager alone | Independent graders |
+| **Comparison** | None | Colour-coded disagreement table |
+| **Gating** | Import immediately | Blocked until all graders agree |
+| **Best for** | Small classes, single-teacher, emergency | Formal exams, double-marking |
+| **UI section used** | Direct Import — Admin Override | Graders + Comparison + Submit |
+
+---
+
+## Dashboard sections
+
+| # | Section | Workflow |
+|---|---|---|
+| 1 | Export Settings | Both |
+| 2 | Download / Export | Both |
+| 3 | Graders | B only |
+| 4 | Grader Submissions | B only |
+| 5 | Grader Comparison | B only |
+| 6 | Edit Answer | Both |
+| 7 | Submit to Gradebook | B only |
+| 8 | Direct Import — Admin Override | A only |
+
+---
+
+## Export settings
+
+Use the **Export Settings** card to select which additional student profile columns
+appear in the grading sheet alongside the question answer columns.
+
+Available columns include `idnumber`, `email`, `firstname`, `lastname`, and any
+custom profile fields defined on the site.
+
+Click **Save settings** after making changes. Settings are stored per quiz.
+
+<Aside type="tip">
+  Adding an `idnumber` column makes it easier for graders to identify students —
+  they can read the number from a student ID card rather than typing full names.
+</Aside>
+
+---
+
+## Workflow A — Direct import
+
+Expand the **Direct Import — Admin Override** card (collapsed by default), choose a
+filled CSV, and click **Import**.
+
+- Validates all rows before writing anything (two-pass).
+- If any answer is invalid the entire import is aborted with a clear error message
+  showing the valid options.
+- Re-importing replaces previous Paper Entry attempts — no duplicates.
+
+<Aside type="caution">
+  The override import commits immediately to the gradebook — there is no comparison
+  step. Use it only when you are confident in the data.
+</Aside>
+
+---
+
+## Workflow B — Multi-grader
+
+### Step 1 — Assign graders
+
+In the **Graders** card, type a teacher's name and click **Add grader**. Repeat for
+each independent grader (typically 2). Each grader immediately gains access to the
+**Submit Your Answers** upload form.
+
+To remove a grader, click **Remove** next to their name. This revokes their access
+and deletes their submitted CSV.
+
+### Step 2 — Students sit the exam; graders fill the CSV
+
+Students sit their regular paper exam as normal — they don't interact with Moodle
+at this stage. Each grader independently downloads the grading sheet (available to them
+via the **Download grading sheet** button on their Paper Entry tab view), fills it in
+with the students' answers from the collected paper sheets, and uploads it via
+**Submit Your Answers**. Once submitted, their file appears in the **Grader
+Submissions** list.
+
+### Step 3 — Monitor the comparison table
+
+Once at least two graders have submitted, the **Grader Comparison** table shows:
+- One row per student
+- One column per grader (showing every grader's answer side-by-side)
+- **Green** = all graders agree | **Red** = disagreement
+
+Graders simultaneously see their own conflict status view — the same colour coding
+per student and question, but **without seeing other graders' answers**, so each
+grader works independently. They can re-upload at any time until all cells are green.
+
+As manager you monitor the overall status. If disagreements persist, follow up with
+the relevant grader offline (check the paper copy, discuss the ambiguous answer).
+
+### Step 4 — Submit to Gradebook
+
+The **Submit to Gradebook** button is enabled only when:
+- All assigned graders have submitted, **and**
+- Every cell in the comparison table is green
+
+Click it to create graded quiz attempts for all students. Grades appear immediately.
+
+---
+
+## Edit Answer
+
+The **Edit Answer** panel lets you correct one answer for one student directly in
+Moodle — no need to modify and re-upload a CSV. Select the student, click the answer
+to change, type the new value, and save. The attempt is updated and the grade
+recalculated immediately.
+
+Useful in both workflows for post-import corrections (e.g. a remark changes one answer).
+
+---
+
+## Value substitutions
+
+If graders use shorthand, define mappings in the **Value Substitutions** card before
+they submit (e.g. `T → True`, `1 → Paris`). See
+[Value Substitutions](/configuration/value-substitutions/) for details.

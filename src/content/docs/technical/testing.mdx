@@ -1,0 +1,136 @@
+---
+title: Testing
+description: Running and writing automated tests for Paper Entry.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Paper Entry includes a PHPUnit test suite covering the core import logic, export
+utilities, and the Privacy API provider.
+
+---
+
+## PHPUnit
+
+### Running the tests
+
+```bash
+# From the Moodle root
+vendor/bin/phpunit mod/quiz/report/paperentry/tests/
+
+# Run a single test file
+vendor/bin/phpunit mod/quiz/report/paperentry/tests/import_test.php
+
+# Run with coverage (requires Xdebug or PCOV)
+vendor/bin/phpunit --coverage-html /tmp/coverage \
+    mod/quiz/report/paperentry/tests/
+```
+
+<Aside type="tip">
+  Run `php admin/tool/phpunit/cli/init.php` once to initialise the PHPUnit
+  environment before the first test run.
+</Aside>
+
+---
+
+### Test files
+
+| File | Coverage |
+|---|---|
+| `tests/import_test.php` | Two-pass import, bad-answer abort, unknown user skip, wrong header, re-import replace |
+| `tests/export_test.php` | `csv_safe()` injection prevention, question filtering, student exclusion of teachers, duplicate name suffixing |
+| `tests/privacy/provider_test.php` | Context discovery for grader & student, users-in-context, delete-all, delete-per-user, bulk delete |
+
+---
+
+### Key test cases
+
+#### `import_test.php`
+
+```php
+// Bad answer aborts entire import — zero DB writes
+public function test_bad_answer_aborts_entire_import(): void {
+    // ... set up quiz with multichoice question ...
+    $csv = "email,Q1\nstudent@example.com,INVALID_ANSWER\n";
+    $result = $importer->process($tmpfile, $quizid);
+    $this->assertFalse($result);
+    $this->assertNotEmpty($importer->get_errors());
+    $this->assertEquals(0, $DB->count_records('quiz_paperentry_attempts'));
+}
+```
+
+#### `export_test.php`
+
+```php
+// csv_safe prevents formula injection — data provider
+public function csv_safe_provider(): array {
+    return [
+        ['=SUM(A1)', "'=SUM(A1)"],
+        ['+cmd',    "'+cmd"],
+        ['normal',  'normal'],
+    ];
+}
+#[DataProvider('csv_safe_provider')]
+public function test_csv_safe(string $input, string $expected): void {
+    $this->assertEquals($expected, export::csv_safe($input));
+}
+```
+
+#### `privacy/provider_test.php`
+
+```php
+// Delete for user removes grader record and submission file
+public function test_delete_data_for_user(): void {
+    // ... set up grader with submission ...
+    provider::delete_data_for_user(new approved_contextlist($grader, 'quiz_paperentry', [$context->id]));
+    $this->assertEquals(0, $DB->count_records('quiz_paperentry_graders', ['userid' => $grader->id]));
+    $file = $fs->get_file($context->id, 'quiz_paperentry', 'submission', $grader->id, '/', 'submission.csv');
+    $this->assertFalse($file);
+}
+```
+
+---
+
+## Behat (acceptance tests)
+
+Behat tests are not included in the initial release. They can be added to
+`tests/behat/` following the standard Moodle Behat structure.
+
+To run any Behat tests tagged `@quiz_paperentry`:
+
+```bash
+php admin/tool/behat/cli/run.php --tags=@quiz_paperentry
+```
+
+---
+
+## Code style checking
+
+Paper Entry follows the Moodle coding standard. Run the code checker before
+submitting a pull request:
+
+```bash
+php local/codechecker/cli/check.php mod/quiz/report/paperentry
+```
+
+Or with the Moodle PHP CodeSniffer ruleset directly:
+
+```bash
+vendor/bin/phpcs --standard=moodle mod/quiz/report/paperentry
+```
+
+---
+
+## Continuous integration
+
+The repository includes a `.github/workflows/` directory with a GitHub Actions
+workflow that runs:
+
+1. PHPUnit tests against Moodle 5.0 and 5.1
+2. PHP CodeSniffer (Moodle standard)
+3. `moodle-plugin-ci` linting (JavaScript, Mustache, lang strings)
+
+<Aside type="note">
+  The GitHub Actions workflow requires `MOODLE_BRANCH` and `DB` environment
+  variables. See `.github/workflows/ci.yml` for the full configuration.
+</Aside>

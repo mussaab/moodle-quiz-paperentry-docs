@@ -1,0 +1,105 @@
+---
+title: Introduction
+description: What Paper Entry is, its two workflows, and why it exists.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+**Paper Entry** is a [Moodle](https://moodle.org) quiz report plugin that bridges
+the gap between paper-based exams and Moodle's gradebook.
+
+Instead of typing every student's answers manually after a paper exam, a manager
+(or an assigned grader) exports a grading sheet, fills it in with student
+answers from the collected papers, then imports it — Moodle automatically grades
+each student's responses exactly as it would a standard online quiz attempt.
+
+---
+
+## Two import workflows
+
+Paper Entry offers two distinct approaches. Choose based on your marking setup.
+
+### Workflow A — Direct import
+
+The simplest path. The manager fills in the grading sheet with student answers and
+imports it directly — no other teachers are involved. Moodle grades the attempts
+automatically using the standard quiz engine.
+
+```
+Manager fills grading sheet → uploads via Direct Import → Moodle grades automatically
+```
+
+**When to use:**
+- Small classes where one teacher handles everything
+- Single-grader setups
+- Emergency re-imports after a mistake
+
+The *Direct Import — Admin Override* section on the manager dashboard handles this
+workflow. It is collapsed by default to keep the interface clean.
+
+---
+
+### Workflow B — Multi-grader with comparison
+
+Two or more teachers each independently fill in a grading sheet and upload it.
+The plugin compares their answers side-by-side. Graders can see where their answers
+conflict (without seeing what others entered) and re-upload until everything agrees.
+Only then can the manager submit to the gradebook.
+
+```
+Grader 1 uploads → sees own conflicts → fixes → re-uploads ──┐
+                                                               ├─→ Manager submits → Moodle grades
+Grader 2 uploads → sees own conflicts → fixes → re-uploads ──┘
+```
+
+**When to use:**
+- Formal end-of-term or standardised exams
+- Quality-assurance double-marking
+- Moderated assessments where two independent marks are required
+
+<Aside type="tip">
+  Workflow B is the recommended approach for formal exams because graders catch and
+  fix their own disagreements independently — before grades are committed.
+</Aside>
+
+---
+
+## Who is it for?
+
+| Role | Workflow A | Workflow B |
+|---|---|---|
+| **Manager / Course coordinator** | Fills grading sheet, imports directly | Assigns graders, monitors comparison table, submits to gradebook |
+| **Teacher / Grader** | — | Downloads grading sheet, fills it in, uploads, reviews own conflicts, re-uploads until green |
+| **Student** | Sits the paper exam; Moodle shows grade automatically | Same |
+
+---
+
+## Supported question types
+
+Paper Entry works with **`multichoice`** and **`truefalse`** questions only.
+
+<Aside type="caution">
+  Questions with "Shuffle answers" enabled will block the grading sheet export — the
+  plugin cannot guarantee a stable answer mapping when answer order is randomised.
+</Aside>
+
+---
+
+## How it fits into Moodle
+
+Paper Entry is a **quiz report subplugin** (`mod/quiz/report/paperentry`). It lives
+entirely inside Moodle — no external service, no separate database, no cron job
+required. Student attempts it creates are standard Moodle quiz attempts — graded by
+Moodle's own quiz engine, indistinguishable from attempts made directly online.
+
+All database access uses the Moodle DBAL (`$DB` API) with no vendor-specific SQL —
+compatible with MySQL, MariaDB, and PostgreSQL.
+
+All JavaScript is delivered through Moodle's AMD module system; all HTML is rendered
+through Mustache templates — fully compatible with Moodle's Content Security Policy.
+
+---
+
+## Next step
+
+Head to [Installation](/getting-started/installation/).

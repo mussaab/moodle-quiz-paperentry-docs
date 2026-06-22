@@ -1,0 +1,112 @@
+---
+title: Value Substitutions
+description: Map short grader notations to full Moodle answer texts.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+**Value Substitutions** let a manager define shorthand mappings so graders can enter
+brief codes in their CSV instead of typing full answer texts.
+
+---
+
+## Why they are needed
+
+Moodle multichoice question options often have long text labels:
+
+```
+Option A: "The process of converting sunlight into chemical energy"
+Option B: "The release of energy from glucose in the presence of oxygen"
+Option C: "The transport of water from roots to leaves via the xylem"
+```
+
+Asking graders to type these in full is error-prone. With value substitutions you
+can allow graders to enter `a`, `b`, or `c` instead.
+
+---
+
+## Defining substitutions
+
+Open the quiz → Paper Entry tab → **Value Substitutions** card.
+
+Each substitution is a pair:
+
+| Field | Description |
+|---|---|
+| **From** | What the grader will type in the CSV |
+| **To** | The full Moodle answer text it maps to |
+
+### Example mappings
+
+| From | To | Use case |
+|---|---|---|
+| `a` | `Paris` | Letter-to-option mapping for multichoice |
+| `1` | `Paris` | Number-to-option mapping |
+| `T` | `True` | Short true/false |
+| `F` | `False` | Short true/false |
+| `Y` | `Yes` | Yes/No questions |
+
+<Aside type="tip">
+  Substitutions are applied **before** answer validation. A grader who types `T`
+  will have it silently converted to `True` before the import checks whether `True`
+  is a valid answer.
+</Aside>
+
+---
+
+## Scope
+
+Substitutions are **per-quiz** — they apply to all questions in the quiz and to all
+grader uploads for that quiz.
+
+They are **not** question-specific. If you map `a → Paris` but another question has
+an option `Amsterdam`, a grader cannot use `a` for both — only the first match wins.
+
+For quizzes where different questions need different mappings, use distinctive codes
+(`q1a`, `q2a`, etc.) or instruct graders to write full answer texts for ambiguous
+questions.
+
+---
+
+## Managing substitutions
+
+### Adding a mapping
+
+Click **Add row** in the Value Substitutions card, fill in the *From* and *To*
+fields, and click **Save**.
+
+### Editing a mapping
+
+Click the edit icon next to any row, change the values, and click **Save**.
+
+### Removing a mapping
+
+Click the delete icon next to the row you want to remove.
+
+### Mapping widget
+
+The substitution UI uses a drag-and-drop tag-picker widget that also supports bulk
+import — you can paste a comma-separated list of `from:to` pairs into the text area.
+
+---
+
+## How substitutions interact with validation
+
+During the import two-pass validation:
+
+1. Each CSV cell value is looked up in the substitution table (case-insensitive).
+2. If a match is found, the value is replaced with the mapped text.
+3. The mapped text is then validated against the question's answer options.
+
+If the mapped text does **not** match any option, the import is aborted with an error
+that shows both the original CSV value *and* the valid options:
+
+```
+Row 3: "x" does not match any answer option for question "Capital cities".
+Valid options are: "Paris", "London", "Berlin", "Madrid".
+```
+
+<Aside type="note">
+  The error shows the **original CSV value** (`x`), not the mapped value, so graders
+  can easily trace the issue back to their spreadsheet.
+</Aside>
