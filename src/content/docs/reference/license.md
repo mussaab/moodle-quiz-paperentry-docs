@@ -23,7 +23,7 @@ program. If not, see <https://www.gnu.org/licenses/>.
 The full license text is available at:
 
 - **Online:** <https://www.gnu.org/licenses/gpl-3.0.html>
-- **In the repository:** [`LICENSE`](https://github.com/your-org/moodle-quiz-paperentry/blob/main/LICENSE)
+- **In the repository:** [`LICENSE`](https://github.com/mussaab/moodle-quiz-paperentry/blob/main/LICENSE)
 
 ---
 
@@ -56,6 +56,6 @@ No additional attribution is required beyond the standard Moodle acknowledgement
 **Mossaab Mohamed Ali**
 - Website: <https://mussaab.com>
 - Email: <mosab@mussaab.com>
-- GitHub: [@your-github-username](https://github.com/your-org)
+- GitHub: [@mussaab](https://github.com/mussaab)
 
 Copyright © 2025–2026 Mossaab Mohamed Ali

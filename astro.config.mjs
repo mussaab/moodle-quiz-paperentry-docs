@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-  site: 'https://your-org.github.io',
+  site: 'https://mussaab.github.io',
   // base: '/moodle-quiz-paperentry',  // uncomment when deploying to GitHub Pages
   integrations: [
     starlight({
@@ -14,10 +14,10 @@ export default defineConfig({
         replacesTitle: false,
       },
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/your-org/moodle-quiz-paperentry' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/mussaab/moodle-quiz-paperentry' },
       ],
       editLink: {
-        baseUrl: 'https://github.com/your-org/moodle-quiz-paperentry/edit/main/docs/',
+        baseUrl: 'https://github.com/mussaab/moodle-quiz-paperentry/edit/main/docs/',
       },
       sidebar: [
         {
