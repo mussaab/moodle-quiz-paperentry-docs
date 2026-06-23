@@ -5,7 +5,7 @@ description: Paper-based quiz grading workflow for Moodle 5.0+
 
 **Paper Entry** is a Moodle quiz report plugin that bridges the gap between paper exams and Moodle's gradebook. Students sit a regular paper exam. Afterwards, a manager (or assigned graders) exports a grading sheet, fills it in with the students' answers from the collected papers, and imports it to automatically create graded quiz attempts.
 
-👉 [Get Started](getting-started/introduction/) — [Quick Start](getting-started/quick-start/)
+👉 [Get Started](/getting-started/introduction/) — [Quick Start](/getting-started/quick-start/)
 
 ---
 
