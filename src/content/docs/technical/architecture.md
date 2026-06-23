@@ -144,4 +144,4 @@ This means files are:
 - Included in Moodle's GDPR data export/deletion for the grader.
 - Backed up if the Moodle backup includes the module context files (note:
   quiz report plugins are not currently called during backup — see
-  [Backup & Restore](/technical/backup-restore/)).
+  [Backup & Restore](backup-restore/)).
