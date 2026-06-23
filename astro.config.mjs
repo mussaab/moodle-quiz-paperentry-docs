@@ -2,8 +2,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-  site: 'https://mussaab.github.io',
-  base: '/moodle-quiz-paperentry-docs',
+  site: 'https://paperentry.mussaab.com',
   integrations: [
     starlight({
       title: 'Paper Entry',
