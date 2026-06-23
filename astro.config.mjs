@@ -10,11 +10,20 @@ export default defineConfig({
       logo: {
         light: './src/assets/logo-light.svg',
         dark:  './src/assets/logo-dark.svg',
-        replacesTitle: false,
+        replacesTitle: true,
       },
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/mussaab/moodle-quiz-paperentry' },
+        { icon: 'github',     label: 'GitHub',           href: 'https://github.com/mussaab' },
+        { icon: 'x.com',     label: 'X / Twitter',      href: 'https://x.com/mussaabcom' },
+        { icon: 'youtube',   label: 'YouTube',           href: 'https://www.youtube.com/@mussaab' },
+        { icon: 'youtube',   label: 'YouTube (Arabic)',  href: 'https://www.youtube.com/@mussaabcom' },
+        { icon: 'facebook',  label: 'Facebook',          href: 'https://www.facebook.com/mussaabcom' },
+        { icon: 'instagram', label: 'Instagram',         href: 'https://www.instagram.com/mussaabcom/' },
+        { icon: 'tiktok',    label: 'TikTok',            href: 'https://www.tiktok.com/@mussaab.com' },
       ],
+      components: {
+        Footer: './src/components/SocialFooter.astro',
+      },
       sidebar: [
         {
           label: 'Getting Started',
