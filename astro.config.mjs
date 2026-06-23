@@ -17,7 +17,7 @@ export default defineConfig({
         { icon: 'github', label: 'GitHub', href: 'https://github.com/mussaab/moodle-quiz-paperentry' },
       ],
       editLink: {
-        baseUrl: 'https://github.com/mussaab/moodle-quiz-paperentry-docs/edit/main/src/content/docs/',
+        baseUrl: 'https://github.com/mussaab/moodle-quiz-paperentry-docs/edit/main/',
       },
       sidebar: [
         {
