@@ -22,7 +22,7 @@ export default defineConfig({
         { icon: 'tiktok',    label: 'TikTok',            href: 'https://www.tiktok.com/@mussaab.com' },
       ],
       components: {
-        PageSidebar: './src/components/SocialFooter.astro',
+        TableOfContents: './src/components/SocialFooter.astro',
       },
       sidebar: [
         {
