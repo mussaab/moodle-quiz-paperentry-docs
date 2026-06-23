@@ -3,7 +3,7 @@ import starlight from '@astrojs/starlight';
 
 export default defineConfig({
   site: 'https://mussaab.github.io',
-  // base: '/moodle-quiz-paperentry',  // uncomment when deploying to GitHub Pages
+  base: '/moodle-quiz-paperentry-docs',
   integrations: [
     starlight({
       title: 'Paper Entry',
